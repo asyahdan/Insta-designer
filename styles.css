@@ -292,9 +292,27 @@ canvas.is-dragging { cursor: grabbing; }
 
 @media (max-width: 900px) {
   .app { flex-direction: column; }
-  .panel { width: 100%; max-height: none; border-right: 0; border-bottom: 1px solid #ddd6c8; }
-  .stage-wrap { padding-top: 12px; }
-  .frame { width: min(100%, 640px); }
+
+  /* Phone layout: the preview sticks to the top of the screen
+     while the controls scroll underneath it. */
+  .stage-wrap {
+    order: -1;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    padding: 10px 16px;
+    background: var(--bg);
+    box-shadow: 0 10px 24px rgba(48, 36, 18, 0.18);
+  }
+  .frame { width: min(100%, 42vh, 420px); }
+  .stage-note { display: none; }
+
+  .panel {
+    width: 100%;
+    max-height: none;
+    border-right: 0;
+    border-top: 1px solid #ddd6c8;
+  }
 }
 
 /* logo on/off + position buttons */
