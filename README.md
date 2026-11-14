@@ -8,7 +8,13 @@ A small browser tool for making square **1080×1080 Instagram feed posts**. Add 
 
 - **Square 1080×1080 canvas**, ready for the Instagram feed
 - **Background photo:** drop an image on the canvas or choose a file, drag to reframe it, and zoom from 100% to 300% (slider or scroll wheel)
-- **Logo pill:** a white oval stuck into the top-left corner, with its left end cut off by the canvas edge
+- **Logo shape:** a white badge at the top of the post
+  - Switch between **No logo** and **With logo**
+  - Choose **Oval** (default) or **Square**
+    - Oval is stuck into the edge. On the left and right it hangs off the corner, with the outer end cut off by the canvas edge
+    - Square has classic corners, sticks to the top edge and keeps a gap from the left and right edges
+  - Place it on the **left**, **middle** or **right**
+  - Uploading a logo replaces the default mark
   - Add up to 8 logos, replace or remove each one
   - Sliders for the distance between logos and the logo size
   - Automatically shrinks to fit if there are too many logos
@@ -25,7 +31,7 @@ A small browser tool for making square **1080×1080 Instagram feed posts**. Add 
 2. Drag the photo to frame it and zoom if needed.
 3. Pick a footer color and set the transparency.
 4. Type your title, category and description.
-5. Add your logos and adjust their size and spacing.
+5. Turn the logo on or off, choose its shape and position, upload your logos and adjust their size and spacing.
 6. Click **Download PNG**.
 
 ## Run it locally

@@ -20,7 +20,10 @@ const state = {
   description: "A short line about the photo, set directly under the category.",
   logos: [{ kind: "default" }],
   logoGap: 18,
-  logoSize: 100,
+  logoSize: 64,
+  showLogos: true,
+  logoPos: "left", // "left" | "middle" | "right"
+  logoShape: "oval", // "oval" | "square"
   bg: null,
   bgX: 0,
   bgY: 0,
@@ -50,7 +53,11 @@ const els = {
   stageNote: document.getElementById("stage-note"),
   footerAlpha: document.getElementById("footer-alpha"),
   footerAlphaValue: document.getElementById("footer-alpha-value"),
-  chips: [...document.querySelectorAll(".chip")],
+  chips: [...document.querySelectorAll(".chip[data-footer]")],
+  logoToggles: [...document.querySelectorAll(".chip[data-logos]")],
+  logoPositions: [...document.querySelectorAll(".chip[data-pos]")],
+  logoShapes: [...document.querySelectorAll(".chip[data-shape]")],
+  logoControls: document.getElementById("logo-controls"),
 };
 
 let logoTarget = null;
@@ -156,7 +163,7 @@ function rgba(hex, alpha) {
   return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
 }
 
-function computeLogos(count, logoSize, gap) {
+function computeLogos(count, logoSize, gap, shape) {
   const maxW = SIZE - 64;
   let size = logoSize;
   let usedGap = gap;
@@ -164,8 +171,13 @@ function computeLogos(count, logoSize, gap) {
   let padY = 0;
   let width = 0;
   for (let i = 0; i < 24; i += 1) {
-    padX = Math.max(28, Math.round(size * 0.7));
-    padY = Math.max(14, Math.round(size * 0.24));
+    if (shape === "square") {
+      padX = Math.max(16, Math.round(size * 0.26));
+      padY = padX;
+    } else {
+      padX = Math.max(28, Math.round(size * 0.7));
+      padY = Math.max(14, Math.round(size * 0.24));
+    }
     width = padX * 2 + count * size + Math.max(0, count - 1) * usedGap;
     if (width <= maxW) break;
     if (size > 42) {
@@ -203,21 +215,37 @@ function flowText(blocks) {
 
 function layout() {
   const count = Math.max(1, state.logos.length);
-  const logos = computeLogos(count, state.logoSize, state.logoGap);
+  const logos = computeLogos(count, state.logoSize, state.logoGap, state.logoShape);
   const margin = 32;
   const padTop = 32;
   const padBottom = 32;
 
-  // Logo pill: stuck into the top-left corner. Its left rounded end hangs
-  // off the canvas edge (the "bleed"), so only the right end shows as an oval.
-  const bleed = Math.round(logos.height / 2);
-  const pill = {
-    ...logos,
-    bleed,
-    x: -bleed,
-    y: 0,
-    width: logos.width + bleed,
-  };
+  // Logo shape, pinned to the top.
+  //  oval:   stuck into the edge. On the left or right it hangs off the canvas corner
+  //          (outer end cut off); in the middle it is a full oval touching the top.
+  //  square: classic square corners, stuck to the top edge with a gap (margin) from the left/right edges.
+  let pill = null;
+  if (state.showLogos) {
+    if (state.logoShape === "square") {
+      const x =
+        state.logoPos === "right"
+          ? SIZE - margin - logos.width
+          : state.logoPos === "middle"
+            ? Math.round((SIZE - logos.width) / 2)
+            : margin;
+      pill = { ...logos, inset: 0, radius: 0, x, y: 0 };
+    } else {
+      const bleed = Math.round(logos.height / 2); // the part that hangs off the canvas
+      const radius = logos.height / 2;
+      if (state.logoPos === "right") {
+        pill = { ...logos, radius, inset: 0, x: SIZE - logos.width, y: 0, width: logos.width + bleed };
+      } else if (state.logoPos === "middle") {
+        pill = { ...logos, radius, inset: 0, x: Math.round((SIZE - logos.width) / 2), y: 0 };
+      } else {
+        pill = { ...logos, radius, inset: bleed, x: -bleed, y: 0, width: logos.width + bleed };
+      }
+    }
+  }
 
   // Footer text: full width, measured from the top of the footer band (y = 0).
   const textX = margin;
@@ -438,7 +466,8 @@ function drawCopy(box) {
 
 function drawPill(box) {
   const { pill } = box;
-  const radius = pill.height / 2;
+  if (!pill) return;
+  const radius = pill.radius;
   ctx.save();
   ctx.shadowColor = "rgba(0,0,0,0.18)";
   ctx.shadowBlur = 18;
@@ -455,7 +484,7 @@ function drawPill(box) {
   ctx.clip();
   const y = pill.y + pill.padY;
   state.logos.forEach((logo, index) => {
-    const x = pill.x + pill.bleed + pill.padX + index * (pill.size + pill.gap);
+    const x = pill.x + pill.inset + pill.padX + index * (pill.size + pill.gap);
     if (logo.kind === "image" && logo.img) drawContain(logo.img, x, y, pill.size, pill.size);
     else drawDefaultMark(x, y, pill.size);
   });
@@ -476,7 +505,8 @@ function draw() {
 }
 
 function syncGapNote(box) {
-  const tightened = box.gapApplied !== state.logoGap || box.sizeApplied !== state.logoSize;
+  const tightened =
+    state.showLogos && (box.gapApplied !== state.logoGap || box.sizeApplied !== state.logoSize);
   els.gapNote.hidden = !tightened;
   if (!tightened) return;
   const bits = [];
@@ -494,6 +524,25 @@ function syncFooter() {
   els.footerAlpha.disabled = state.footer === "none";
   els.footerAlpha.value = String(state.footerTransparency);
   els.footerAlphaValue.textContent = `${state.footerTransparency}%`;
+}
+
+function syncLogoControls() {
+  for (const chip of els.logoToggles) {
+    const on = (chip.dataset.logos === "on") === state.showLogos;
+    chip.classList.toggle("is-on", on);
+    chip.setAttribute("aria-pressed", on ? "true" : "false");
+  }
+  for (const chip of els.logoPositions) {
+    const on = chip.dataset.pos === state.logoPos;
+    chip.classList.toggle("is-on", on);
+    chip.setAttribute("aria-pressed", on ? "true" : "false");
+  }
+  for (const chip of els.logoShapes) {
+    const on = chip.dataset.shape === state.logoShape;
+    chip.classList.toggle("is-on", on);
+    chip.setAttribute("aria-pressed", on ? "true" : "false");
+  }
+  els.logoControls.hidden = !state.showLogos;
 }
 
 function syncBackgroundControls() {
@@ -566,8 +615,13 @@ async function addLogoFile(file, index) {
     const src = await readFile(file);
     const img = await loadImage(src);
     const entry = { kind: "image", img, src };
-    if (index == null) state.logos.push(entry);
-    else state.logos[index] = entry;
+    if (index != null) {
+      state.logos[index] = entry;
+    } else if (state.logos.length === 1 && state.logos[0].kind === "default") {
+      state.logos[0] = entry; // first upload replaces the default mark
+    } else {
+      state.logos.push(entry);
+    }
     renderLogos();
     draw();
   } catch (error) {
@@ -637,6 +691,28 @@ function bind() {
     state.description = els.description.value;
     draw();
   });
+
+  for (const chip of els.logoToggles) {
+    chip.addEventListener("click", () => {
+      state.showLogos = chip.dataset.logos === "on";
+      syncLogoControls();
+      draw();
+    });
+  }
+  for (const chip of els.logoShapes) {
+    chip.addEventListener("click", () => {
+      state.logoShape = chip.dataset.shape;
+      syncLogoControls();
+      draw();
+    });
+  }
+  for (const chip of els.logoPositions) {
+    chip.addEventListener("click", () => {
+      state.logoPos = chip.dataset.pos;
+      syncLogoControls();
+      draw();
+    });
+  }
 
   els.addLogo.addEventListener("click", () => {
     if (state.logos.length >= MAX_LOGOS) return;
@@ -759,6 +835,7 @@ function bind() {
 
 bind();
 syncFooter();
+syncLogoControls();
 syncBackgroundControls();
 renderLogos();
 draw();

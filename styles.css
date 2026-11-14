@@ -296,3 +296,30 @@ canvas.is-dragging { cursor: grabbing; }
   .stage-wrap { padding-top: 12px; }
   .frame { width: min(100%, 640px); }
 }
+
+/* logo on/off + position buttons */
+.chips.three { grid-template-columns: repeat(3, 1fr); }
+
+.chip.plain {
+  justify-content: center;
+  padding: 9px 12px;
+  font-weight: 700;
+}
+
+.chip.plain.is-on {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+  box-shadow: none;
+}
+
+.subhead {
+  margin: 18px 0 8px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.hint.tight { margin-top: 14px; }

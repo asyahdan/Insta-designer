@@ -63,21 +63,41 @@
 
       <section class="section">
         <h2>Logos</h2>
-        <p class="hint">One white oval sits at the top left of the post. Add marks and it stretches to fit them.</p>
-        <div id="logo-list" class="logo-list"></div>
-        <button type="button" class="btn secondary" id="add-logo">Add logo</button>
-        <input id="logo-file" type="file" accept="image/*" hidden />
+        <div class="chips" role="radiogroup" aria-label="Show logo">
+          <button type="button" class="chip plain" data-logos="off">No logo</button>
+          <button type="button" class="chip plain" data-logos="on">With logo</button>
+        </div>
 
-        <label class="field slider">
-          <span>Distance between logos <strong id="gap-value">18</strong></span>
-          <input id="logo-gap" type="range" min="0" max="72" step="2" value="18" />
-        </label>
-        <p id="gap-note" class="hint warn" hidden></p>
+        <div id="logo-controls">
+          <h3 class="subhead">Shape</h3>
+          <div class="chips" role="radiogroup" aria-label="Logo shape">
+            <button type="button" class="chip plain" data-shape="oval">Oval</button>
+            <button type="button" class="chip plain" data-shape="square">Square</button>
+          </div>
 
-        <label class="field slider">
-          <span>Logo size <strong id="size-value">100</strong></span>
-          <input id="logo-size" type="range" min="64" max="140" step="2" value="100" />
-        </label>
+          <h3 class="subhead">Position</h3>
+          <div class="chips three" role="radiogroup" aria-label="Logo position">
+            <button type="button" class="chip plain" data-pos="left">Left</button>
+            <button type="button" class="chip plain" data-pos="middle">Middle</button>
+            <button type="button" class="chip plain" data-pos="right">Right</button>
+          </div>
+
+          <p class="hint tight">One white shape sits at the top of the post. Upload a logo and it replaces the default mark. Add more and the shape stretches to fit them.</p>
+          <div id="logo-list" class="logo-list"></div>
+          <button type="button" class="btn secondary" id="add-logo">Add logo</button>
+          <input id="logo-file" type="file" accept="image/*" hidden />
+
+          <label class="field slider">
+            <span>Distance between logos <strong id="gap-value">18</strong></span>
+            <input id="logo-gap" type="range" min="0" max="72" step="2" value="18" />
+          </label>
+          <p id="gap-note" class="hint warn" hidden></p>
+
+          <label class="field slider">
+            <span>Logo size <strong id="size-value">64</strong></span>
+            <input id="logo-size" type="range" min="64" max="140" step="2" value="64" />
+          </label>
+        </div>
       </section>
 
       <section class="section">
