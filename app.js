@@ -2,9 +2,9 @@ const SIZE = 1080;
 const FONT = 'Manrope, "Segoe UI", sans-serif';
 const DISPLAY = 'Sora, Manrope, "Segoe UI", sans-serif';
 const FOOTER_COLORS = {
-  red: "#5c0e19",
-  blue: "#0a2a5c",
-  green: "#0a4128",
+  red: "#500001",
+  blue: "#00134f",
+  green: "#00501c",
 };
 const FADE_HEIGHT = 120; // how far the footer fades up into the photo
 const MAX_LOGOS = 8;
