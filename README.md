@@ -4,6 +4,8 @@ A small browser tool for making square **1080×1080 Instagram feed posts**. Add 
 
 **Live demo:** https://asyahdan.github.io/Insta-designer/
 
+![Demo](demo/demo.gif)
+
 ## Features
 
 - **Square 1080×1080 canvas**, ready for the Instagram feed
